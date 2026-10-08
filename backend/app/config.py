@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from functools import lru_cache
 from pathlib import Path
+from typing import Annotated
 
 from pydantic import field_validator
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 BACKEND_DIR = Path(__file__).resolve().parent.parent
 
@@ -28,8 +29,10 @@ class Settings(BaseSettings):
     # The one OTP the mocked verification flow accepts.
     mock_otp_code: str = "123456"
 
-    # Comma-separated in the environment, list in code.
-    allowed_origins: list[str] = [
+    # Comma-separated in the environment, list in code. NoDecode stops
+    # pydantic-settings from trying to JSON-parse the raw env value before our
+    # validator below gets a chance to split it.
+    allowed_origins: Annotated[list[str], NoDecode] = [
         "http://localhost:3000",
         "http://127.0.0.1:3000",
     ]
